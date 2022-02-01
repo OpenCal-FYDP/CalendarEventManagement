@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/OpenCal-FYDP/Identity/internal/service"
-	"github.com/OpenCal-FYDP/Identity/rpc"
+	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/service"
+	"github.com/OpenCal-FYDP/CalendarEventManagement/rpc"
 	"log"
 	"net/http"
 )
