@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/OpenCal-FYDP/Identity/rpc"
+	"github.com/OpenCal-FYDP/CalendarEventManagement/rpc"
 )
 
 type CalEventManagmentService struct{}
