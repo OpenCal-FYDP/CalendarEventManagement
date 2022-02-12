@@ -8,10 +8,10 @@ Description: 'AWS CloudFormation Sample Template EC2InstanceWithSecurityGroupSam
   EC2 instance. You will be billed for the AWS resources used if you create a stack
   from this template.'
 Parameters:
-  KeyName:
-    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
-    Type: AWS::EC2::KeyPair::KeyName
-    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+#  KeyName:
+#    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+#    Type: AWS::EC2::KeyPair::KeyName
+#    ConstraintDescription: must be the name of an existing EC2 KeyPair.
   InstanceType:
     Description: WebServer EC2 instance type
     Type: String
@@ -56,25 +56,25 @@ Parameters:
   ReadCapacityUnits:
     Description: Provisioned read throughput
     Type: Number
-    Default: '5'
-    MinValue: '5'
+    Default: '1'
+    MinValue: '1'
     MaxValue: '10000'
-    ConstraintDescription: must be between 5 and 10000
+    ConstraintDescription: must be between 1 and 10000
   WriteCapacityUnits:
     Description: Provisioned write throughput
     Type: Number
-    Default: '10'
-    MinValue: '5'
+    Default: '1'
+    MinValue: '1'
     MaxValue: '10000'
-    ConstraintDescription: must be between 5 and 10000
+    ConstraintDescription: must be between 1 and 10000
 Resources:
   # ec2 resources
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: !Ref 'InstanceType'
+      InstanceType: 't2.nano'
       SecurityGroups: [!Ref 'InstanceSecurityGroup']
-      KeyName: !Ref 'KeyName'
+#      KeyName: !Ref 'KeyName'
       ImageId: !Ref 'LatestAmiId'
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -86,15 +86,19 @@ Resources:
           ToPort: 22
           CidrIp: !Ref 'SSHLocation'
   # dynamoDB resources
-  myDynamoDBTable:
+  calendarEventsDatabase:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: !Ref 'HashKeyElementName'
-          AttributeType: !Ref 'HashKeyElementType'
+        - AttributeName: "CalendarEventID"
+          AttributeType: S
+        - AttributeName: "timeToNotify"
+          AttributeType: S
       KeySchema:
-        - AttributeName: !Ref 'HashKeyElementName'
-          KeyType: HASH
+        - AttributeName: 'CalendarEventID'
+          KeyType: "HASH"
+        - AttributeName: 'timeToNotify'
+          KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref 'ReadCapacityUnits'
         WriteCapacityUnits: !Ref 'WriteCapacityUnits'
@@ -112,5 +116,5 @@ Outputs:
     Description: Public IP address of the newly created EC2 instance
     Value: !GetAtt [EC2Instance, PublicIp]
   TableName:
-    Value: !Ref 'myDynamoDBTable'
+    Value: !Ref 'calendarEventsDatabase'
     Description: Table name of the newly created DynamoDB table
