@@ -261,8 +261,8 @@ Resources:
             - Ref: PublicSecurityGroup
           SubnetId:
             Ref: PublicSubnet1
-          SecurityGroupIds:
-            - !Ref 'PublicSecurityGroup'
+#          SecurityGroupIds:
+#            - !Ref 'PublicSecurityGroup'
       UserData:
         Fn::Base64:
           !Sub |
