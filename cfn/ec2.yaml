@@ -67,15 +67,176 @@ Parameters:
     MinValue: '1'
     MaxValue: '10000'
     ConstraintDescription: must be between 1 and 10000
+  # IP configuration
+  VPCCidrBlock:
+    Description: 'CIDR IP for VPC'
+    Type: String
+    Default: 10.0.0.0/16
+
+  PublicCidrBlock1:
+    Description: 'CIDR IP for public subnet'
+    Type: String
+    Default: 10.0.1.0/24
+
+  PublicSGSource:
+    Description: The IP address range that can be used to access the web app
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 0.0.0.0/0
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  # true/false resource switches
+  PublicEnabledParam:
+    Description: 'true if resources to connect VPC to internet should be deployed'
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: false
+  EC2SecurityEnabledParam:
+    Description: 'true if resources necessary for EC2 security should be deployed'
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: false
 Resources:
-  PublicSubnet1:
-    Type: AWS::EC2::Subnet
+  ###########
+  # VPC with Internet Gateway
+  ###########
+
+  #VPC
+  SimpleVPC:
+    Type: AWS::EC2::VPC
     Properties:
-      VpcId: !Ref PubPrivateVPC
-      AvailabilityZone: us-east-2
-      CidrBlock: 10.0.1.0/24
-      MapPublicIpOnLaunch: true
-  # ec2 resources
+      #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc.html
+      CidrBlock: !Ref VPCCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+#      Tags:
+#        - Key: Name
+#          Value: !Join
+#            - '-'
+#            - - !Ref NamingPrefix
+#              - VPC
+
+  #Internet Gateway: Allows communication between instances in your VPC and the internet.
+  IGW:
+    Condition: PublicEnabled
+    #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-internetgateway.html
+    Type: AWS::EC2::InternetGateway
+    Properties:
+#      Tags:
+#        - Key: Name
+#          Value: !Join
+#            - '-'
+#            - - !Ref NamingPrefix
+#              - IGW
+  IGWAttach:
+    Condition: PublicEnabled
+    #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc-gateway-attachment.html
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref SimpleVPC
+      InternetGatewayId: !Ref IGW
+      #VpnGatewayId
+
+
+  ###########
+  # Route Table to Internet
+  ###########
+
+  # Route to/from Internet
+  InternetRoute:
+    Condition: PublicEnabled
+    Type: AWS::EC2::Route
+    #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW
+      RouteTableId: !Ref InternetRouteTable
+
+  InternetRouteTable:
+    Condition: PublicEnabled
+    #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route-table.html
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref SimpleVPC
+#      Tags:
+#        - Key: Name
+#          Value: !Join
+#            - '-'
+#            - - !Ref NamingPrefix
+#              - Public
+#              - RTB
+
+  ###########
+  # Public Subnet
+  ###########
+
+  PublicSubnet1:
+    Condition: PublicEnabled
+    Type: AWS::EC2::Subnet
+    #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet.html
+    Properties:
+      VpcId: !Ref SimpleVPC
+      AvailabilityZone: !Select
+        - 0
+        - !GetAZs #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getavailabilityzones.html
+          Ref: 'AWS::Region'
+      CidrBlock: !Ref PublicCidrBlock1
+      MapPublicIpOnLaunch: false
+#      Tags:
+#        - Key: Name
+#          Value: !Join
+#            - '-'
+#            - - !Ref NamingPrefix
+#              - Public
+#              - 1
+
+  PublicSubnet1RouteToInternet:
+    Condition: PublicEnabled
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet-route-table-assoc.html
+    DependsOn:
+      - PublicSubnet1
+      - InternetRouteTable
+    Properties:
+      RouteTableId: !Ref InternetRouteTable
+      SubnetId: !Ref PublicSubnet1
+
+  ###########
+  # App Security Group
+  ###########
+
+  PublicSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: EC2SecurityEnabled
+    Properties:
+      VpcId: !Ref SimpleVPC
+      GroupName: !Join
+        - '-'
+        - - !Ref NamingPrefix
+          - SG
+      GroupDescription: >-
+        Enable HTTP access via port 80 and 443 to the allowed CIDR
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref PublicSGSource
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: !Ref PublicSGSource
+#      Tags:
+#        - Key: Name
+#          Value: !Join
+#            - '-'
+#            - - !Ref NamingPrefix
+#              - SG
+  #ec2 instance
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -83,13 +244,16 @@ Resources:
       SecurityGroups: [!Ref 'InstanceSecurityGroup']
 #      KeyName: !Ref 'KeyName'
       ImageId: !Ref 'LatestAmiId'
-      NetworkInterfaces:
-        - AssociatePublicIpAddress: "true"
-          DeviceIndex: "0"
-          GroupSet:
-            - Ref: InstanceSecurityGroup
-          SubnetId:
-            Ref: PublicSubnet1
+#      NetworkInterfaces:
+#        - AssociatePublicIpAddress: "true"
+#          DeviceIndex: "0"
+#          GroupSet:
+#            - Ref: InstanceSecurityGroup
+#          SubnetId:
+#            Ref: PublicSubnet1
+      SecurityGroupIds:
+        - !Ref PublicSecurityGroup
+        SubnetId: !Ref PublicSubnet1
       UserData:
         Fn::Base64:
           !Sub |
