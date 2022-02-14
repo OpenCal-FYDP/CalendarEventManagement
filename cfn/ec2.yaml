@@ -249,7 +249,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: 't2.nano'
-      SecurityGroups: [!Ref 'InstanceSecurityGroup']
+#      SecurityGroups: [!Ref 'InstanceSecurityGroup']
 #      KeyName: !Ref 'KeyName'
       ImageId: !Ref 'LatestAmiId'
 
