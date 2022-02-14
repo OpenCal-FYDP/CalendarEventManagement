@@ -252,8 +252,7 @@ Resources:
       SecurityGroups: [!Ref 'InstanceSecurityGroup']
 #      KeyName: !Ref 'KeyName'
       ImageId: !Ref 'LatestAmiId'
-#      SecurityGroupIds:
-#        - !Ref 'PublicSecurityGroup'
+
 #      SubnetId: !Ref 'PublicSubnet1'
       NetworkInterfaces:
         - AssociatePublicIpAddress: "true"
@@ -262,6 +261,8 @@ Resources:
             - Ref: PublicSecurityGroup
           SubnetId:
             Ref: PublicSubnet1
+          SecurityGroupIds:
+            - !Ref 'PublicSecurityGroup'
       UserData:
         Fn::Base64:
           !Sub |
