@@ -223,10 +223,10 @@ Resources:
     Condition: EC2SecurityEnabled
     Properties:
       VpcId: !Ref SimpleVPC
-      GroupName: !Join
-        - '-'
-        - - !Ref NamingPrefix
-          - SG
+#      GroupName: !Join
+#        - '-'
+#        - - !Ref NamingPrefix
+#          - SG
       GroupDescription: >-
         Enable HTTP access via port 80 and 443 to the allowed CIDR
       SecurityGroupIngress:
