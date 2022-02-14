@@ -93,14 +93,22 @@ Parameters:
     AllowedValues:
       - true
       - false
-    Default: false
+    Default: true ##TODO switch
   EC2SecurityEnabledParam:
     Description: 'true if resources necessary for EC2 security should be deployed'
     Type: String
     AllowedValues:
       - true
       - false
-    Default: false
+    Default: true ##TODO switch
+#####################################
+Conditions:
+  # Create resources to connect VPC to the internet
+  PublicEnabled: !Equals [!Ref PublicEnabledParam, "true"]
+
+  # Create security resources needed for an EC2 instances
+  EC2SecurityEnabled: !Equals [!Ref EC2SecurityEnabledParam, "true"]
+#####################################
 Resources:
   ###########
   # VPC with Internet Gateway
