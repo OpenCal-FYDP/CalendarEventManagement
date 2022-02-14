@@ -53,20 +53,20 @@ Parameters:
 #    MinLength: '1'
 #    MaxLength: '1'
 #    ConstraintDescription: must be either S or N
-#  ReadCapacityUnits:
-#    Description: Provisioned read throughput
-#    Type: Number
-#    Default: '1'
-#    MinValue: '1'
-#    MaxValue: '10000'
-#    ConstraintDescription: must be between 1 and 10000
-#  WriteCapacityUnits:
-#    Description: Provisioned write throughput
-#    Type: Number
-#    Default: '1'
-#    MinValue: '1'
-#    MaxValue: '10000'
-#    ConstraintDescription: must be between 1 and 10000
+  ReadCapacityUnits:
+    Description: Provisioned read throughput
+    Type: Number
+    Default: '1'
+    MinValue: '1'
+    MaxValue: '10000'
+    ConstraintDescription: must be between 1 and 10000
+  WriteCapacityUnits:
+    Description: Provisioned write throughput
+    Type: Number
+    Default: '1'
+    MinValue: '1'
+    MaxValue: '10000'
+    ConstraintDescription: must be between 1 and 10000
 Resources:
   # ec2 resources
   EC2Instance:
