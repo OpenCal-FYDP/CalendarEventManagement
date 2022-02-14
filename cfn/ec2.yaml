@@ -68,6 +68,13 @@ Parameters:
     MaxValue: '10000'
     ConstraintDescription: must be between 1 and 10000
 Resources:
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref PubPrivateVPC
+      AvailabilityZone: us-east-2
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
   # ec2 resources
   EC2Instance:
     Type: AWS::EC2::Instance
@@ -80,7 +87,7 @@ Resources:
         - AssociatePublicIpAddress: "true"
           DeviceIndex: "0"
           GroupSet:
-            - Ref: PublicSecurityGroup
+            - Ref: InstanceSecurityGroup
           SubnetId:
             Ref: PublicSubnet1
       UserData:
