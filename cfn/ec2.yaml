@@ -268,11 +268,8 @@ Resources:
           !Sub |
           #!/bin/bash -xe
           yum -y update
-          sudo apt-get install build-essential golang git
-          export GOPATH=$HOME/go
-
-          sudo apt-get install build-essential golang git
-          export GOPATH=$HOME/go
+#          sudo apt-get install build-essential golang git
+#          export GOPATH=$HOME/go
 #          go get github.com/OpenCal-FYDP/CalendarEventManagement
 #          cd ~/go/src/github.com/OpenCal-FYDP/CalendarEventManagement
 #          go build
