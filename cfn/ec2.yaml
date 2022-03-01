@@ -267,16 +267,12 @@ Resources:
         Fn::Base64:
           !Sub |
           #!/bin/bash -xe
-          yum -y update
-          sudo yum install -y httpd
-          sudo systemctl start httpd
-          sudo echo '<h1>Hello from ${AWS::Region}</h1>' > /var/www/html/index.html
-#          sudo apt-get install build-essential golang git
-#          export GOPATH=$HOME/go
-#          go get github.com/OpenCal-FYDP/CalendarEventManagement
-#          cd ~/go/src/github.com/OpenCal-FYDP/CalendarEventManagement
-#          go build
-#          go run
+          sudo apt-get install build-essential golang git
+          export GOPATH=$HOME/go
+          go get github.com/OpenCal-FYDP/CalendarEventManagement
+          cd ~/go/src/github.com/OpenCal-FYDP/CalendarEventManagement
+          go build
+          ./CalendarEventManagement
 
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
