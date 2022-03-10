@@ -22,4 +22,9 @@ func TestStorage_CreateEvent(t *testing.T) {
 		err := s.UpdateEvent(e)
 		assert.NoError(t, err)
 	})
+
+	t.Run("Delete", func(t *testing.T) {
+		err := s.DeleteEvent(e.CalendarEventID)
+		assert.NoError(t, err)
+	})
 }
