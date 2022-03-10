@@ -1,3 +1,6 @@
 *.xml
 .idea/
 .DS_store
+/internal/scheduler/credentials.json
+/credentials.json
+/token.json

@@ -27,7 +27,9 @@ message CalEvent {
 message CreateEventReq {
   string calendarId = 1;
   string eventId = 2;
-  CalEvent event = 3;
+//  string oauthToken = 3;
+  CalEvent event = 4;
+  string ownerOfEvent = 5; // email used to fetch oauth token from identity service
 }
 
 message CreateEventRes {
@@ -39,7 +41,9 @@ message CreateEventRes {
 message UpdateEventReq {
   string calendarId = 1;
   string eventId = 2;
-  CalEvent event = 3;
+//  string oauthToken = 3;
+  CalEvent event = 4;
+  string ownerOfEvent = 5; // email used to fetch oauth token from identity service
 }
 
 message UpdateEventRes {
@@ -51,6 +55,8 @@ message UpdateEventRes {
 message DeleteEventReq {
   string calendarId = 1;
   string eventId = 2;
+//  string oauthToken = 3;
+  string ownerOfEvent = 5; // email used to fetch oauth token from identity service
 }
 
 message DeleteEventRes {}
