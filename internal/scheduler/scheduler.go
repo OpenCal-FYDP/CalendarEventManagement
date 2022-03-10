@@ -3,6 +3,7 @@ package scheduler
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/storage"
 	"github.com/OpenCal-FYDP/Identity/rpc"
 	"golang.org/x/oauth2"
@@ -17,6 +18,28 @@ const identityServiceUrl = "http://ec2-54-82-78-138.compute-1.amazonaws.com:8080
 type Scheduler struct {
 }
 
+func getToken(eventOwnerEmail string, eventOwnerUsername string) (*oauth2.Token, error) {
+	// get last stored token
+	idClient := rpc.NewIdentityServiceJSONClient(identityServiceUrl, &http.Client{})
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	res, err := idClient.GetUser(ctx, &rpc.GetUserReq{Email: eventOwnerEmail, Username: eventOwnerUsername})
+	if err != nil {
+		return nil, err
+	}
+
+	tokenAsBytes := res.GetOathToken()
+	if tokenAsBytes == nil {
+		return nil, errors.New("nil token recieved from identity service")
+	}
+
+	token := &oauth2.Token{}
+	err = json.Unmarshal(tokenAsBytes, token)
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
+}
+
 func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername string, data *storage.EventData) error {
 	// data sanitize to default to jonathan
 	if eventOwnerEmail == "" {
@@ -26,22 +49,15 @@ func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername strin
 		eventOwnerUsername = "jspsun"
 	}
 
-	config := &oauth2.Config{}
+	token, err := getToken(eventOwnerEmail, eventOwnerUsername)
+	if err != nil {
+		return err
+	}
 
-	idClient := rpc.NewIdentityServiceJSONClient(identityServiceUrl, &http.Client{})
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
-	res, err := idClient.GetUser(ctx, &rpc.GetUserReq{Email: eventOwnerEmail, Username: eventOwnerUsername})
-	if err != nil {
-		return err
-	}
 
-	tokenAsBytes := res.GetOathToken()
-
-	token := &oauth2.Token{}
-	err = json.Unmarshal([]byte(tokenAsBytes), token)
-	if err != nil {
-		return err
-	}
+	config := oauth2.Config{}
+	//client := config.Client(context.Background(), token)
 
 	srv, err := calendar.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
 	if err != nil {
