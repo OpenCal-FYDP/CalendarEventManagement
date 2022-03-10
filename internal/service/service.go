@@ -6,28 +6,28 @@ import (
 	"github.com/OpenCal-FYDP/CalendarEventManagement/rpc"
 )
 
-type CalEventManagmentService struct {
+type CalEventManagementService struct {
 	s *storage.Storage
 }
 
-func (c *CalEventManagmentService) CreateEvent(ctx context.Context, req *rpc.CreateEventReq) (*rpc.CreateEventRes, error) {
+func (c *CalEventManagementService) CreateEvent(ctx context.Context, req *rpc.CreateEventReq) (*rpc.CreateEventRes, error) {
 	panic("implement me")
 }
 
-func (c *CalEventManagmentService) UpdateEvent(ctx context.Context, req *rpc.UpdateEventReq) (*rpc.UpdateEventRes, error) {
+func (c *CalEventManagementService) UpdateEvent(ctx context.Context, req *rpc.UpdateEventReq) (*rpc.UpdateEventRes, error) {
 	panic("implement me")
 }
 
-func (c *CalEventManagmentService) DeleteEvent(ctx context.Context, req *rpc.DeleteEventReq) (*rpc.DeleteEventRes, error) {
+func (c *CalEventManagementService) DeleteEvent(ctx context.Context, req *rpc.DeleteEventReq) (*rpc.DeleteEventRes, error) {
 	panic("implement me")
 }
 
-func (c *CalEventManagmentService) GetEvent(ctx context.Context, req *rpc.GetEventReq) (*rpc.GetEventRes, error) {
+func (c *CalEventManagementService) GetEvent(ctx context.Context, req *rpc.GetEventReq) (*rpc.GetEventRes, error) {
 	panic("implement me")
 }
 
-func New() *CalEventManagmentService {
-	return &CalEventManagmentService{
+func New() *CalEventManagementService {
+	return &CalEventManagementService{
 		s: storage.New(),
 	}
 }

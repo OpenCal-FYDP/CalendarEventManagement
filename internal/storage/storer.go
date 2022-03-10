@@ -11,8 +11,8 @@ import (
 type EventData struct {
 	CalendarEventID string
 	//TimeToNotify string
-	Start     string
-	End       string
+	Start     int64
+	End       int64
 	Attendees []string
 	Location  string
 	Summary   string
@@ -46,7 +46,7 @@ func (s *Storage) UpdateEvent(event *EventData) error {
 	// Now create put item
 	input := &dynamodb.PutItemInput{
 		Item:      av,
-		TableName: aws.String("userTable"),
+		TableName: aws.String("calEvents"),
 	}
 
 	_, err = s.client.PutItem(input)
@@ -68,7 +68,7 @@ func (s *Storage) DeleteEvent(calendarEventID string) error {
 	// Now create put item
 	input := &dynamodb.DeleteItemInput{
 		Key:       av,
-		TableName: aws.String("userTable"),
+		TableName: aws.String("calEvents"),
 	}
 
 	_, err = s.client.DeleteItem(input)
