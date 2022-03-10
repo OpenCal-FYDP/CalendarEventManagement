@@ -5,7 +5,8 @@ import (
 	"github.com/OpenCal-FYDP/CalendarEventManagement/rpc"
 )
 
-type CalEventManagmentService struct{}
+type CalEventManagmentService struct {
+}
 
 func (c *CalEventManagmentService) CreateEvent(ctx context.Context, req *rpc.CreateEventReq) (*rpc.CreateEventRes, error) {
 	panic("implement me")
@@ -16,6 +17,10 @@ func (c *CalEventManagmentService) UpdateEvent(ctx context.Context, req *rpc.Upd
 }
 
 func (c *CalEventManagmentService) DeleteEvent(ctx context.Context, req *rpc.DeleteEventReq) (*rpc.DeleteEventRes, error) {
+	panic("implement me")
+}
+
+func (c *CalEventManagmentService) GetEvent(ctx context.Context, req *rpc.GetEventReq) (*rpc.GetEventRes, error) {
 	panic("implement me")
 }
 

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	service := service.New()
-	server := rpc.NewCalendarEventManagementServiceServer(service)
+	svc := service.New()
+	server := rpc.NewCalendarEventManagementServiceServer(svc)
 	log.Fatal(http.ListenAndServe(":8080", server))
 }

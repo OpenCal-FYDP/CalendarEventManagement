@@ -9,6 +9,9 @@ service CalendarEventManagementService {
   // return the updated event if successful
   rpc UpdateEvent(UpdateEventReq) returns (UpdateEventRes);
   rpc DeleteEvent(DeleteEventReq) returns (DeleteEventRes);
+
+  // get event
+  rpc GetEvent(GetEventReq) returns (GetEventRes);
 }
 
 // implemented to google’s spec https://developers.google.com/calendar/api/guides/create-events
@@ -51,3 +54,11 @@ message DeleteEventReq {
 }
 
 message DeleteEventRes {}
+
+message GetEventReq {
+  string eventId = 1;
+}
+
+message GetEventRes {
+  CalEvent event = 1;
+}
