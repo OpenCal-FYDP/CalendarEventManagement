@@ -18,8 +18,8 @@ service CalendarEventManagementService {
 message CalEvent {
   string summary = 1;
   string location = 2;
-  string Start = 3; //iso timestamp
-  string end = 4; //iso timestamp
+  int64 Start = 3; //iso timestamp
+  int64 end = 4; //iso timestamp
   repeated string recurrence = 5;
   repeated string attendees = 6;
 }
