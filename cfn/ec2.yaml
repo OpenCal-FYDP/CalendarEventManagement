@@ -291,13 +291,13 @@ Resources:
       AttributeDefinitions:
         - AttributeName: "CalendarEventID"
           AttributeType: S
-        - AttributeName: "timeToNotify"
-          AttributeType: S
+#        - AttributeName: "TimeToNotify"
+#          AttributeType: S
       KeySchema:
         - AttributeName: 'CalendarEventID'
           KeyType: "HASH"
-        - AttributeName: 'timeToNotify'
-          KeyType: "RANGE"
+#        - AttributeName: 'TimeToNotify'
+#          KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: !Ref 'ReadCapacityUnits'
         WriteCapacityUnits: !Ref 'WriteCapacityUnits'

@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/storage"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/rpc"
 )
 
 type CalEventManagmentService struct {
+	s *storage.Storage
 }
 
 func (c *CalEventManagmentService) CreateEvent(ctx context.Context, req *rpc.CreateEventReq) (*rpc.CreateEventRes, error) {
@@ -25,5 +27,7 @@ func (c *CalEventManagmentService) GetEvent(ctx context.Context, req *rpc.GetEve
 }
 
 func New() *CalEventManagmentService {
-	return &CalEventManagmentService{}
+	return &CalEventManagmentService{
+		s: storage.New(),
+	}
 }
