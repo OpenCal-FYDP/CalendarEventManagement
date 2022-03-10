@@ -54,24 +54,51 @@ func (s *Storage) UpdateEvent(event *EventData) error {
 	return err
 }
 
-func (s *Storage) DeleteEvent(calendarEventID string) error {
-	e := &EventData{
-		CalendarEventID: calendarEventID,
-	}
-
-	av, err := dynamodbattribute.MarshalMap(e)
-
-	if err != nil {
-		return err
-	}
+func (s *Storage) GetEvent(calendarEventID string) (*EventData, error) {
+	//e := &EventData{
+	//	CalendarEventID: calendarEventID,
+	//}
+	//
+	//av, err := dynamodbattribute.MarshalMap(e)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	// Now create put item
-	input := &dynamodb.DeleteItemInput{
-		Key:       av,
+	input := &dynamodb.GetItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"CalendarEventID": {
+				S: aws.String(calendarEventID),
+			},
+		},
 		TableName: aws.String("calEvents"),
 	}
 
-	_, err = s.client.DeleteItem(input)
+	res, err := s.client.GetItem(input)
+	if err != nil {
+		return nil, err
+	}
+
+	retEvent := &EventData{}
+	err = dynamodbattribute.UnmarshalMap(res.Item, retEvent)
+	if err != nil {
+		return nil, err
+	}
+
+	return retEvent, nil
+}
+
+func (s *Storage) DeleteEvent(calendarEventID string) error {
+	input := &dynamodb.DeleteItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"CalendarEventID": {
+				S: aws.String(calendarEventID),
+			},
+		},
+		TableName: aws.String("calEvents"),
+	}
+
+	_, err := s.client.DeleteItem(input)
 
 	return err
 }
