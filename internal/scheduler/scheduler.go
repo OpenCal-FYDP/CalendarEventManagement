@@ -7,6 +7,7 @@ import (
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/secretfetcher"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/storage"
 	"github.com/OpenCal-FYDP/Identity/rpc"
+	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"
@@ -115,9 +116,14 @@ func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername strin
 		Id: data.CalendarEventID,
 		//Recurrence: []string{"RRULE:FREQ=DAILY;COUNT=2"},
 		Attendees: atts,
+		ConferenceData: &calendar.ConferenceData{
+			CreateRequest: &calendar.CreateConferenceRequest{
+				RequestId: uuid.New().String(),
+			},
+		},
 	}
 
-	_, err = srv.Events.Insert("primary", calEvent).Do()
+	_, err = srv.Events.Insert("primary", calEvent).ConferenceDataVersion(1).Do()
 	if err != nil {
 		return err
 	}
