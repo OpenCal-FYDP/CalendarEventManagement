@@ -1,6 +1,6 @@
 import { client } from "twirpscript";
 import { nodeHttpTransport } from "twirpscript/dist/node/index.js";
-import {CreateEvent} from "./service.pb.js";
+import {CreateEvent} from "./calservice.pb.js";
 
 client.baseURL = "http://localhost:8080";
 
