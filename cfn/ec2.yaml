@@ -267,10 +267,10 @@ Resources:
         Fn::Base64:
           !Sub |
           #!/bin/bash -xe
-          sudo apt-get install build-essential golang git
+          sudo yum install golang git -y
           export GOPATH=$HOME/go
-          go get github.com/OpenCal-FYDP/CalendarEventManagement
-          cd ~/go/src/github.com/OpenCal-FYDP/CalendarEventManagement
+          git clone https://github.com/OpenCal-FYDP/CalendarEventManagement.git
+          cd ./CalendarEventManagement
           go build
           ./CalendarEventManagement
 
