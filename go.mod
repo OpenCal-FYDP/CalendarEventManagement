@@ -6,6 +6,7 @@ require (
 	github.com/OpenCal-FYDP/Identity v0.0.0-20220310170422-765d27468fc7
 	github.com/aws/aws-sdk-go v1.43.15
 	github.com/google/uuid v1.1.2
+	github.com/rs/cors v1.8.2
 	github.com/stretchr/testify v1.7.0
 	github.com/twitchtv/twirp v8.1.1+incompatible
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
@@ -19,7 +20,6 @@ require (
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
-	github.com/gusaul/go-dynamock v0.0.0-20210107061312-3e989056e1e6 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
