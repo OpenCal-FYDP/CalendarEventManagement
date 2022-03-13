@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/secretfetcher"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/storage"
 	"github.com/OpenCal-FYDP/Identity/rpc"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
 	"net/http"
@@ -45,6 +47,11 @@ func getToken(eventOwnerEmail string, eventOwnerUsername string) (*oauth2.Token,
 }
 
 func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername string, data *storage.EventData) error {
+
+	if data == nil {
+		return errors.New("nil data")
+	}
+
 	// data sanitize to default to jonathan
 	if eventOwnerEmail == "" {
 		eventOwnerEmail = "jspsun@gmail.com"
@@ -59,8 +66,26 @@ func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername strin
 		return err
 	}
 
-	config := oauth2.Config{}
-	client := config.Client(context.Background(), token)
+	// get oauthClientCreds
+	// fetch these each time so we can change them on the fly
+	res, err := secretfetcher.GetOauthConfig()
+	if err != nil {
+		return err
+	}
+
+	// thing for client redirect
+	config := oauth2.Config{
+		ClientID:     res.OAuthClientID,
+		ClientSecret: res.ClientSecret,
+		Endpoint:     google.Endpoint,
+		RedirectURL:  "http://localhost",
+		Scopes:       nil,
+	}
+
+	// refresh token
+	newToken, err := config.TokenSource(context.Background(), token).Token()
+
+	client := config.Client(context.Background(), newToken)
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
@@ -69,24 +94,27 @@ func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername strin
 		return err
 	}
 
+	// construct attendees
+	atts := []*calendar.EventAttendee{}
+
+	for _, attendee := range data.Attendees {
+		atts = append(atts, &calendar.EventAttendee{Email: attendee})
+	}
+
+	// construct cal event
 	calEvent := &calendar.Event{
 		Summary:     data.Summary,
 		Location:    data.Location,
 		Description: "meeting scheduled with openCal",
 		Start: &calendar.EventDateTime{
-			DateTime: time.Unix(data.Start, 0).Format(time.RFC3339),
-			//TimeZone: "America/Los_Angeles",
+			DateTime: time.Unix(data.Start, 0).UTC().Format(time.RFC3339),
 		},
 		End: &calendar.EventDateTime{
-			DateTime: time.Unix(data.End, 0).Format(time.RFC3339),
-			//TimeZone: "America/Los_Angeles",
+			DateTime: time.Unix(data.End, 0).UTC().Format(time.RFC3339),
 		},
 		Id: data.CalendarEventID,
 		//Recurrence: []string{"RRULE:FREQ=DAILY;COUNT=2"},
-		//Attendees: []*calendar.EventAttendee{
-		//	&calendar.EventAttendee{Email:"lpage@example.com"},
-		//	&calendar.EventAttendee{Email:"sbrin@example.com"},
-		//},
+		Attendees: atts,
 	}
 
 	_, err = srv.Events.Insert("primary", calEvent).Do()
