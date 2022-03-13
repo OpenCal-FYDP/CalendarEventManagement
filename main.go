@@ -28,7 +28,7 @@ func main() {
 		fmt.Printf("Randomly Generated Secret: %s\n", secret)
 	}
 	corsWrapper := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:3000"},
+		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"POST"},
 		AllowedHeaders: []string{"Content-Type"},
 	})
