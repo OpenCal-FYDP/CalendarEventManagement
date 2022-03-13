@@ -2,8 +2,8 @@
 name: 'Deploy to AWS CloudFormation'
 
 on:
-#  push:
-#    branches: [ master ]
+  push:
+    branches: [ master ]
 #  pull_request:
 #    branches: [ master ]
 

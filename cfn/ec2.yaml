@@ -266,13 +266,13 @@ Resources:
       UserData:
         Fn::Base64:
           !Sub |
-          #!/bin/bash -xe
-          sudo yum install golang git -y
-          export GOPATH=$HOME/go
-          git clone https://github.com/OpenCal-FYDP/CalendarEventManagement.git
-          cd ./CalendarEventManagement
-          go build
-          ./CalendarEventManagement
+            #!/bin/bash -xe
+            sudo yum install golang git -y
+            export GOPATH=$HOME/go
+            git clone https://github.com/OpenCal-FYDP/CalendarEventManagement.git
+            cd ./CalendarEventManagement
+            go build
+            ./CalendarEventManagement
 
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
