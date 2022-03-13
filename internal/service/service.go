@@ -3,12 +3,14 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/scheduler"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/storage"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/rpc"
 )
 
 type CalEventManagementService struct {
-	s *storage.Storage
+	s     *storage.Storage
+	sched *scheduler.Scheduler
 }
 
 func (c *CalEventManagementService) CreateEvent(ctx context.Context, req *rpc.CreateEventReq) (*rpc.CreateEventRes, error) {
@@ -25,9 +27,14 @@ func (c *CalEventManagementService) CreateEvent(ctx context.Context, req *rpc.Cr
 		Summary:         req.GetEvent().GetSummary(),
 	}
 
-	// TODO attempt to make event on gcal
+	// attempt to make event on gcal
+	// since we are only using email as ID, use same owner tag for both fields
+	err := c.sched.CreateEvent(req.GetOwnerOfEvent(), req.GetOwnerOfEvent(), e)
+	if err != nil {
+		return nil, err
+	}
 
-	err := c.s.CreateEvent(e)
+	err = c.s.CreateEvent(e)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +119,7 @@ func (c *CalEventManagementService) GetEvent(ctx context.Context, req *rpc.GetEv
 
 func New() *CalEventManagementService {
 	return &CalEventManagementService{
-		s: storage.New(),
+		s:     storage.New(),
+		sched: scheduler.New(),
 	}
 }

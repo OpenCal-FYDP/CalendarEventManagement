@@ -13,6 +13,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", server))
 }
 
+// uncomment and run to manually get new oauth token
 //
 //// Retrieve a token, saves the token, then returns the generated client.
 //func getClient(config *oauth2.Config) *http.Client {
