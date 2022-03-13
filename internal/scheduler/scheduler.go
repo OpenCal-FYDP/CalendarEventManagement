@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-const identityServiceUrl = "http://ec2-54-147-167-136.compute-1.amazonaws.com:8080"
+const identityServiceUrl = "http://ec2-3-80-94-41.compute-1.amazonaws.com:8080"
 
 type Scheduler struct {
 }

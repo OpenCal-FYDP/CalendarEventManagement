@@ -3,8 +3,11 @@ package service
 import (
 	"context"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/rpc"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"strings"
 	"testing"
+	"time"
 )
 
 func TestService(t *testing.T) {
@@ -12,13 +15,13 @@ func TestService(t *testing.T) {
 	e := &rpc.CalEvent{
 		Summary:    "aSummary",
 		Location:   "aLocation",
-		Start:      1,
-		End:        2,
+		Start:      time.Now().Unix(),
+		End:        time.Now().Add(time.Hour).Unix(),
 		Recurrence: nil,
-		Attendees:  []string{"1Person", "2Person"},
+		Attendees:  []string{"jspsun+test@gmail.com"},
 	}
 	calendarId := "aCalEventID"
-	eventID := "AEventID"
+	eventID := strings.Join(strings.Split(uuid.New().String(), "-"), "")
 
 	t.Run("CreateEvent", func(t *testing.T) {
 
