@@ -9,14 +9,17 @@ service CalendarEventManagementService {
   // return the updated event if successful
   rpc UpdateEvent(UpdateEventReq) returns (UpdateEventRes);
   rpc DeleteEvent(DeleteEventReq) returns (DeleteEventRes);
+
+  // get event
+  rpc GetEvent(GetEventReq) returns (GetEventRes);
 }
 
 // implemented to google’s spec https://developers.google.com/calendar/api/guides/create-events
 message CalEvent {
   string summary = 1;
   string location = 2;
-  string Start = 3; //iso timestamp
-  string end = 4; //iso timestamp
+  int64 Start = 3; //iso timestamp
+  int64 end = 4; //iso timestamp
   repeated string recurrence = 5;
   repeated string attendees = 6;
 }
@@ -24,7 +27,9 @@ message CalEvent {
 message CreateEventReq {
   string calendarId = 1;
   string eventId = 2;
-  CalEvent event = 3;
+//  string oauthToken = 3;
+  CalEvent event = 4;
+  string ownerOfEvent = 5; // email used to fetch oauth token from identity service
 }
 
 message CreateEventRes {
@@ -36,7 +41,9 @@ message CreateEventRes {
 message UpdateEventReq {
   string calendarId = 1;
   string eventId = 2;
-  CalEvent event = 3;
+//  string oauthToken = 3;
+  CalEvent event = 4;
+  string ownerOfEvent = 5; // email used to fetch oauth token from identity service
 }
 
 message UpdateEventRes {
@@ -48,6 +55,16 @@ message UpdateEventRes {
 message DeleteEventReq {
   string calendarId = 1;
   string eventId = 2;
+//  string oauthToken = 3;
+  string ownerOfEvent = 5; // email used to fetch oauth token from identity service
 }
 
 message DeleteEventRes {}
+
+message GetEventReq {
+  string eventId = 1;
+}
+
+message GetEventRes {
+  CalEvent event = 1;
+}
