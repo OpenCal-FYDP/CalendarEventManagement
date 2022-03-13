@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/OpenCal-FYDP/Identity v0.0.0-20220310170422-765d27468fc7
 	github.com/aws/aws-sdk-go v1.43.15
+	github.com/google/uuid v1.1.2
 	github.com/stretchr/testify v1.7.0
 	github.com/twitchtv/twirp v8.1.1+incompatible
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
