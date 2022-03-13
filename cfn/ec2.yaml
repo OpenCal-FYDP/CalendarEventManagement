@@ -267,7 +267,8 @@ Resources:
         Fn::Base64:
           !Sub |
             #!/bin/bash -xe
-            sudo yum install golang git -y
+            sudo yum install tmux golang git -y
+            tmux
             export GOPATH=$HOME/go
             git clone https://github.com/OpenCal-FYDP/CalendarEventManagement.git
             cd ./CalendarEventManagement
