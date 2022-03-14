@@ -3,14 +3,50 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/scheduler"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/storage"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/rpc"
+	"strconv"
+	"time"
 )
 
 type CalEventManagementService struct {
 	s     *storage.Storage
 	sched *scheduler.Scheduler
+}
+
+func serializeTimeIntervals(start, end time.Time) string {
+	return fmt.Sprintf("%s-%s", strconv.FormatInt(start.Unix(), 10), strconv.FormatInt(end.Unix(), 10))
+}
+
+//TODO remove stub and implement
+func (c *CalEventManagementService) GetUsersGcalEvents(ctx context.Context, req *rpc.GetUsersGcalEventsReq) (*rpc.GetUsersGcalEventsRes, error) {
+	events, err := c.sched.GetUserEvents(req.GetEmail(), req.GetUsername())
+	if err != nil {
+		return nil, err
+	}
+
+	ret := &rpc.GetUsersGcalEventsRes{
+		EventIntervals: events,
+	}
+	return ret, nil
+}
+
+//TODO remove stub and implement
+func (c *CalEventManagementService) GetTeamssGcalEvents(ctx context.Context, req *rpc.GetTeamsGcalEventsReq) (*rpc.GetTeamsGcalEventsRes, error) {
+	now := time.Now()
+
+	ret := &rpc.GetTeamsGcalEventsRes{
+		EventIntervals: []string{
+			serializeTimeIntervals(now, now.Add(time.Hour*3)),
+			serializeTimeIntervals(now.Add(time.Hour*20), now.Add(time.Hour*20).Add(time.Minute*22)),
+			serializeTimeIntervals(now.Add(time.Hour*30), now.Add(time.Hour*35)),
+
+			serializeTimeIntervals(now.Add(time.Hour*25), now.Add(time.Hour*33)), // overlaps on purpose
+		},
+	}
+	return ret, nil
 }
 
 func (c *CalEventManagementService) CreateEvent(ctx context.Context, req *rpc.CreateEventReq) (*rpc.CreateEventRes, error) {

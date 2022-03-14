@@ -55,4 +55,24 @@ func TestService(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, res)
 	})
+	t.Run("getUserEvents", func(t *testing.T) {
+
+		req := &rpc.GetUsersGcalEventsReq{
+			Email:    "",
+			Username: "",
+		}
+
+		res, err := c.GetUsersGcalEvents(context.Background(), req)
+		require.NoError(t, err)
+		require.NotNil(t, res)
+	})
+
+	t.Run("getTeamEvents", func(t *testing.T) {
+
+		req := &rpc.GetTeamsGcalEventsReq{}
+
+		res, err := c.GetTeamssGcalEvents(context.Background(), req)
+		require.NoError(t, err)
+		require.NotNil(t, res)
+	})
 }
