@@ -76,4 +76,24 @@ func TestService(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, res)
 	})
+	t.Run("deleteEvent", func(t *testing.T) {
+		createReq := &rpc.CreateEventReq{
+			CalendarId: calendarId,
+			EventId:    eventID,
+			Event:      e,
+		}
+
+		CreateRes, err := c.CreateEvent(context.Background(), createReq)
+		require.NoError(t, err)
+		require.NotNil(t, CreateRes)
+
+		req := &rpc.DeleteEventReq{
+			CalendarId: calendarId,
+			EventId:    eventID,
+		}
+
+		res, err := c.DeleteEvent(context.Background(), req)
+		require.NoError(t, err)
+		require.NotNil(t, res)
+	})
 }

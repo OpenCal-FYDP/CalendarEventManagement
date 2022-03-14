@@ -120,9 +120,12 @@ func (c *CalEventManagementService) UpdateEvent(ctx context.Context, req *rpc.Up
 }
 
 func (c *CalEventManagementService) DeleteEvent(ctx context.Context, req *rpc.DeleteEventReq) (*rpc.DeleteEventRes, error) {
-	// TODO attempt to delete event on gcal
+	err := c.sched.DeleteEvent(req.GetOwnerOfEvent(), req.GetOwnerOfEvent(), req.GetEventId())
+	if err != nil {
+		return nil, err
+	}
 
-	err := c.s.DeleteEvent(req.GetEventId())
+	err = c.s.DeleteEvent(req.GetEventId())
 	if err != nil {
 		return nil, err
 	}
