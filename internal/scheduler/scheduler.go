@@ -180,10 +180,10 @@ func (s *Scheduler) GetUserEvents(eventOwnerEmail string, eventOwnerUsername str
 	return ret, nil
 }
 
-func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername string, data *storage.EventData) error {
+func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername string, data *storage.EventData) (string, error) {
 
 	if data == nil {
-		return errors.New("nil data")
+		return "", errors.New("nil data")
 	}
 
 	// data sanitize to default to jonathan
@@ -197,12 +197,12 @@ func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername strin
 	// get oath token from user service
 	token, err := s.getToken(eventOwnerEmail, eventOwnerUsername)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	srv, err := getCalService(token, eventOwnerEmail, eventOwnerUsername)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// construct attendees
@@ -233,11 +233,11 @@ func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername strin
 		},
 	}
 
-	_, err = srv.Events.Insert("primary", calEvent).ConferenceDataVersion(1).Do()
+	res, err := srv.Events.Insert("primary", calEvent).ConferenceDataVersion(1).Do()
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return res.HtmlLink, nil
 }
 
 func (s *Scheduler) DeleteEvent(eventOwnerEmail string, eventOwnerUsername string, calEventID string) error {

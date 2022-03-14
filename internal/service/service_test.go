@@ -11,14 +11,15 @@ import (
 )
 
 func TestService(t *testing.T) {
-	c := New()
+	c, err := New()
+	require.NoError(t, err)
 	e := &rpc.CalEvent{
 		Summary:    "aSummary",
 		Location:   "aLocation",
 		Start:      time.Now().Unix(),
 		End:        time.Now().Add(time.Hour).Unix(),
 		Recurrence: nil,
-		Attendees:  []string{"jspsun+test@gmail.com"},
+		Attendees:  []string{"jspsun+test@gmail.com", "jspsun+realtest@gmail.com"},
 	}
 	calendarId := "aCalEventID"
 	eventID := strings.Join(strings.Split(uuid.New().String(), "-"), "")

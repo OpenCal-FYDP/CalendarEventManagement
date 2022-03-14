@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/emailer"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/scheduler"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/storage"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/rpc"
@@ -12,8 +13,9 @@ import (
 )
 
 type CalEventManagementService struct {
-	s     *storage.Storage
-	sched *scheduler.Scheduler
+	storer *storage.Storage
+	sched  *scheduler.Scheduler
+	emailr *emailer.Emailer
 }
 
 func serializeTimeIntervals(start, end time.Time) string {
@@ -60,12 +62,19 @@ func (c *CalEventManagementService) CreateEvent(ctx context.Context, req *rpc.Cr
 
 	// attempt to make event on gcal
 	// since we are only using email as ID, use same owner tag for both fields
-	err := c.sched.CreateEvent(req.GetOwnerOfEvent(), req.GetOwnerOfEvent(), e)
+	link, err := c.sched.CreateEvent(req.GetOwnerOfEvent(), req.GetOwnerOfEvent(), e)
 	if err != nil {
 		return nil, err
 	}
 
-	err = c.s.CreateEvent(e)
+	// create event in our DB
+	err = c.storer.CreateEvent(e)
+	if err != nil {
+		return nil, err
+	}
+
+	// adds owners
+	err = c.emailr.SendConfirmationEmail(req.GetOwnerOfEvent(), e.Attendees, link)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +109,7 @@ func (c *CalEventManagementService) UpdateEvent(ctx context.Context, req *rpc.Up
 
 	// TODO attempt to make event on gcal
 
-	err := c.s.CreateEvent(e)
+	err := c.storer.CreateEvent(e)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +134,7 @@ func (c *CalEventManagementService) DeleteEvent(ctx context.Context, req *rpc.De
 		return nil, err
 	}
 
-	err = c.s.DeleteEvent(req.GetEventId())
+	err = c.storer.DeleteEvent(req.GetEventId())
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +143,7 @@ func (c *CalEventManagementService) DeleteEvent(ctx context.Context, req *rpc.De
 }
 
 func (c *CalEventManagementService) GetEvent(ctx context.Context, req *rpc.GetEventReq) (*rpc.GetEventRes, error) {
-	e, err := c.s.GetEvent(req.GetEventId())
+	e, err := c.storer.GetEvent(req.GetEventId())
 	if err != nil {
 		return nil, err
 	}
@@ -151,9 +160,14 @@ func (c *CalEventManagementService) GetEvent(ctx context.Context, req *rpc.GetEv
 	}, nil
 }
 
-func New() *CalEventManagementService {
-	return &CalEventManagementService{
-		s:     storage.New(),
-		sched: scheduler.New(),
+func New() (*CalEventManagementService, error) {
+	e, err := emailer.New()
+	if err != nil {
+		return nil, err
 	}
+	return &CalEventManagementService{
+		storer: storage.New(),
+		sched:  scheduler.New(),
+		emailr: e,
+	}, nil
 }
