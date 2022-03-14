@@ -82,7 +82,7 @@ message GetUsersGcalEventsReq {
 }
 
 message GetUsersGcalEventsRes {
-  repeated string eventIntervals = 1; //in the form ${startEpochTime}-${endEpochTime}
+  repeated string eventIntervals = 1;
 }
 
 message GetTeamsGcalEventsReq {
@@ -90,5 +90,5 @@ message GetTeamsGcalEventsReq {
 }
 
 message GetTeamsGcalEventsRes {
-  repeated string eventIntervals = 1; //in the form ${startEpochTime}-${endEpochTime}
+  repeated string eventIntervals = 1;
 }
