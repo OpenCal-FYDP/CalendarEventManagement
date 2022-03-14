@@ -39,11 +39,26 @@ func getToken(eventOwnerEmail string, eventOwnerUsername string) (*oauth2.Token,
 		return nil, errors.New("nil token recieved from identity service")
 	}
 
+	type tstruct struct {
+		AccessToken  string `json:"access_token"`
+		TokenType    string `json:"token_type,omitempty"`
+		RefreshToken string `json:"refresh_token,omitempty"`
+		Expiry       int64  `json:"expiry,omitempty"`
+	}
+
+	t := new(tstruct)
+
 	token := &oauth2.Token{}
-	err = json.Unmarshal(tokenAsBytes, token)
+	err = json.Unmarshal(tokenAsBytes, t)
 	if err != nil {
 		return nil, err
 	}
+
+	token.AccessToken = t.AccessToken
+	token.RefreshToken = t.RefreshToken
+	token.TokenType = t.TokenType
+	token.Expiry = time.Unix(t.Expiry, 0)
+
 	return token, nil
 }
 
