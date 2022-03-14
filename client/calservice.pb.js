@@ -61,6 +61,30 @@ export async function GetEvent(getEventReq, config) {
   return GetEventRes.decode(response);
 }
 
+/**
+ * get get a user's GCalEvents
+ */
+export async function GetUsersGcalEvents(getUsersGcalEventsReq, config) {
+  const response = await PBrequest(
+    "/CalendarEventManagementService/GetUsersGcalEvents",
+    GetUsersGcalEventsReq.encode(getUsersGcalEventsReq),
+    config
+  );
+  return GetUsersGcalEventsRes.decode(response);
+}
+
+/**
+ * get get a teams's  user's GCalEvents
+ */
+export async function GetTeamssGcalEvents(getTeamsGcalEventsReq, config) {
+  const response = await PBrequest(
+    "/CalendarEventManagementService/GetTeamssGcalEvents",
+    GetTeamsGcalEventsReq.encode(getTeamsGcalEventsReq),
+    config
+  );
+  return GetTeamsGcalEventsRes.decode(response);
+}
+
 //============================================//
 // CalendarEventManagementService JSON Client //
 //============================================//
@@ -110,6 +134,30 @@ export async function GetEventJSON(getEventReq, config) {
   return response;
 }
 
+/**
+ * get get a user's GCalEvents
+ */
+export async function GetUsersGcalEventsJSON(getUsersGcalEventsReq, config) {
+  const response = await JSONrequest(
+    "/CalendarEventManagementService/GetUsersGcalEvents",
+    getUsersGcalEventsReq,
+    config
+  );
+  return response;
+}
+
+/**
+ * get get a teams's  user's GCalEvents
+ */
+export async function GetTeamssGcalEventsJSON(getTeamsGcalEventsReq, config) {
+  const response = await JSONrequest(
+    "/CalendarEventManagementService/GetTeamssGcalEvents",
+    getTeamsGcalEventsReq,
+    config
+  );
+  return response;
+}
+
 export function createCalendarEventManagementServiceHandler(service) {
   return {
     name: "CalendarEventManagementService",
@@ -137,6 +185,18 @@ export function createCalendarEventManagementServiceHandler(service) {
         handler: service.GetEvent,
         input: GetEventReq,
         output: GetEventRes,
+      },
+      GetUsersGcalEvents: {
+        name: "GetUsersGcalEvents",
+        handler: service.GetUsersGcalEvents,
+        input: GetUsersGcalEventsReq,
+        output: GetUsersGcalEventsRes,
+      },
+      GetTeamssGcalEvents: {
+        name: "GetTeamssGcalEvents",
+        handler: service.GetTeamssGcalEvents,
+        input: GetTeamsGcalEventsReq,
+        output: GetTeamsGcalEventsRes,
       },
     },
   };
@@ -1259,6 +1319,429 @@ export const GetEventRes = {
       const m = CalEvent.initialize();
       CalEvent._readMessageJSON(m, event);
       msg.event = m;
+    }
+    return msg;
+  },
+};
+
+export const GetUsersGcalEventsReq = {
+  /**
+   * Serializes a GetUsersGcalEventsReq to protobuf.
+   */
+  encode: function (getUsersGcalEventsReq) {
+    return GetUsersGcalEventsReq._writeMessage(
+      getUsersGcalEventsReq,
+      new BinaryWriter()
+    ).getResultBuffer();
+  },
+
+  /**
+   * Deserializes a GetUsersGcalEventsReq from protobuf.
+   */
+  decode: function (bytes) {
+    return GetUsersGcalEventsReq._readMessage(
+      GetUsersGcalEventsReq.initialize(),
+      new BinaryReader(bytes)
+    );
+  },
+
+  /**
+   * Serializes a GetUsersGcalEventsReq to JSON.
+   */
+  encodeJSON: function (getUsersGcalEventsReq) {
+    return JSON.stringify(
+      GetUsersGcalEventsReq._writeMessageJSON(getUsersGcalEventsReq)
+    );
+  },
+
+  /**
+   * Deserializes a GetUsersGcalEventsReq from JSON.
+   */
+  decodeJSON: function (json) {
+    return GetUsersGcalEventsReq._readMessageJSON(
+      GetUsersGcalEventsReq.initialize(),
+      JSON.parse(json)
+    );
+  },
+
+  /**
+   * Initializes a GetUsersGcalEventsReq with all fields set to their default value.
+   */
+  initialize: function () {
+    return {
+      email: "",
+      username: "",
+    };
+  },
+
+  /**
+   * @private
+   */
+  _writeMessage: function (msg, writer) {
+    if (msg.email) {
+      writer.writeString(1, msg.email);
+    }
+    if (msg.username) {
+      writer.writeString(2, msg.username);
+    }
+    return writer;
+  },
+
+  /**
+   * @private
+   */
+  _writeMessageJSON: function (msg) {
+    const json = {};
+    if (msg.email) {
+      json.email = msg.email;
+    }
+    if (msg.username) {
+      json.username = msg.username;
+    }
+    return json;
+  },
+
+  /**
+   * @private
+   */
+  _readMessage: function (msg, reader) {
+    while (reader.nextField()) {
+      const field = reader.getFieldNumber();
+      switch (field) {
+        case 1: {
+          msg.email = reader.readString();
+          break;
+        }
+        case 2: {
+          msg.username = reader.readString();
+          break;
+        }
+        default: {
+          reader.skipField();
+          break;
+        }
+      }
+    }
+    return msg;
+  },
+
+  /**
+   * @private
+   */
+  _readMessageJSON: function (msg, json) {
+    const email = json.email ?? json.email;
+    if (email) {
+      msg.email = email;
+    }
+    const username = json.username ?? json.username;
+    if (username) {
+      msg.username = username;
+    }
+    return msg;
+  },
+};
+
+export const GetUsersGcalEventsRes = {
+  /**
+   * Serializes a GetUsersGcalEventsRes to protobuf.
+   */
+  encode: function (getUsersGcalEventsRes) {
+    return GetUsersGcalEventsRes._writeMessage(
+      getUsersGcalEventsRes,
+      new BinaryWriter()
+    ).getResultBuffer();
+  },
+
+  /**
+   * Deserializes a GetUsersGcalEventsRes from protobuf.
+   */
+  decode: function (bytes) {
+    return GetUsersGcalEventsRes._readMessage(
+      GetUsersGcalEventsRes.initialize(),
+      new BinaryReader(bytes)
+    );
+  },
+
+  /**
+   * Serializes a GetUsersGcalEventsRes to JSON.
+   */
+  encodeJSON: function (getUsersGcalEventsRes) {
+    return JSON.stringify(
+      GetUsersGcalEventsRes._writeMessageJSON(getUsersGcalEventsRes)
+    );
+  },
+
+  /**
+   * Deserializes a GetUsersGcalEventsRes from JSON.
+   */
+  decodeJSON: function (json) {
+    return GetUsersGcalEventsRes._readMessageJSON(
+      GetUsersGcalEventsRes.initialize(),
+      JSON.parse(json)
+    );
+  },
+
+  /**
+   * Initializes a GetUsersGcalEventsRes with all fields set to their default value.
+   */
+  initialize: function () {
+    return {
+      eventIntervals: [],
+    };
+  },
+
+  /**
+   * @private
+   */
+  _writeMessage: function (msg, writer) {
+    if (msg.eventIntervals?.length) {
+      writer.writeRepeatedString(1, msg.eventIntervals);
+    }
+    return writer;
+  },
+
+  /**
+   * @private
+   */
+  _writeMessageJSON: function (msg) {
+    const json = {};
+    if (msg.eventIntervals?.length) {
+      json.eventIntervals = msg.eventIntervals;
+    }
+    return json;
+  },
+
+  /**
+   * @private
+   */
+  _readMessage: function (msg, reader) {
+    while (reader.nextField()) {
+      const field = reader.getFieldNumber();
+      switch (field) {
+        case 1: {
+          msg.eventIntervals.push(reader.readString());
+          break;
+        }
+        default: {
+          reader.skipField();
+          break;
+        }
+      }
+    }
+    return msg;
+  },
+
+  /**
+   * @private
+   */
+  _readMessageJSON: function (msg, json) {
+    const eventIntervals = json.eventIntervals ?? json.eventIntervals;
+    if (eventIntervals) {
+      msg.eventIntervals = eventIntervals;
+    }
+    return msg;
+  },
+};
+
+export const GetTeamsGcalEventsReq = {
+  /**
+   * Serializes a GetTeamsGcalEventsReq to protobuf.
+   */
+  encode: function (getTeamsGcalEventsReq) {
+    return GetTeamsGcalEventsReq._writeMessage(
+      getTeamsGcalEventsReq,
+      new BinaryWriter()
+    ).getResultBuffer();
+  },
+
+  /**
+   * Deserializes a GetTeamsGcalEventsReq from protobuf.
+   */
+  decode: function (bytes) {
+    return GetTeamsGcalEventsReq._readMessage(
+      GetTeamsGcalEventsReq.initialize(),
+      new BinaryReader(bytes)
+    );
+  },
+
+  /**
+   * Serializes a GetTeamsGcalEventsReq to JSON.
+   */
+  encodeJSON: function (getTeamsGcalEventsReq) {
+    return JSON.stringify(
+      GetTeamsGcalEventsReq._writeMessageJSON(getTeamsGcalEventsReq)
+    );
+  },
+
+  /**
+   * Deserializes a GetTeamsGcalEventsReq from JSON.
+   */
+  decodeJSON: function (json) {
+    return GetTeamsGcalEventsReq._readMessageJSON(
+      GetTeamsGcalEventsReq.initialize(),
+      JSON.parse(json)
+    );
+  },
+
+  /**
+   * Initializes a GetTeamsGcalEventsReq with all fields set to their default value.
+   */
+  initialize: function () {
+    return {
+      teamID: "",
+    };
+  },
+
+  /**
+   * @private
+   */
+  _writeMessage: function (msg, writer) {
+    if (msg.teamID) {
+      writer.writeString(1, msg.teamID);
+    }
+    return writer;
+  },
+
+  /**
+   * @private
+   */
+  _writeMessageJSON: function (msg) {
+    const json = {};
+    if (msg.teamID) {
+      json.teamID = msg.teamID;
+    }
+    return json;
+  },
+
+  /**
+   * @private
+   */
+  _readMessage: function (msg, reader) {
+    while (reader.nextField()) {
+      const field = reader.getFieldNumber();
+      switch (field) {
+        case 1: {
+          msg.teamID = reader.readString();
+          break;
+        }
+        default: {
+          reader.skipField();
+          break;
+        }
+      }
+    }
+    return msg;
+  },
+
+  /**
+   * @private
+   */
+  _readMessageJSON: function (msg, json) {
+    const teamID = json.teamID ?? json.teamID;
+    if (teamID) {
+      msg.teamID = teamID;
+    }
+    return msg;
+  },
+};
+
+export const GetTeamsGcalEventsRes = {
+  /**
+   * Serializes a GetTeamsGcalEventsRes to protobuf.
+   */
+  encode: function (getTeamsGcalEventsRes) {
+    return GetTeamsGcalEventsRes._writeMessage(
+      getTeamsGcalEventsRes,
+      new BinaryWriter()
+    ).getResultBuffer();
+  },
+
+  /**
+   * Deserializes a GetTeamsGcalEventsRes from protobuf.
+   */
+  decode: function (bytes) {
+    return GetTeamsGcalEventsRes._readMessage(
+      GetTeamsGcalEventsRes.initialize(),
+      new BinaryReader(bytes)
+    );
+  },
+
+  /**
+   * Serializes a GetTeamsGcalEventsRes to JSON.
+   */
+  encodeJSON: function (getTeamsGcalEventsRes) {
+    return JSON.stringify(
+      GetTeamsGcalEventsRes._writeMessageJSON(getTeamsGcalEventsRes)
+    );
+  },
+
+  /**
+   * Deserializes a GetTeamsGcalEventsRes from JSON.
+   */
+  decodeJSON: function (json) {
+    return GetTeamsGcalEventsRes._readMessageJSON(
+      GetTeamsGcalEventsRes.initialize(),
+      JSON.parse(json)
+    );
+  },
+
+  /**
+   * Initializes a GetTeamsGcalEventsRes with all fields set to their default value.
+   */
+  initialize: function () {
+    return {
+      eventIntervals: [],
+    };
+  },
+
+  /**
+   * @private
+   */
+  _writeMessage: function (msg, writer) {
+    if (msg.eventIntervals?.length) {
+      writer.writeRepeatedString(1, msg.eventIntervals);
+    }
+    return writer;
+  },
+
+  /**
+   * @private
+   */
+  _writeMessageJSON: function (msg) {
+    const json = {};
+    if (msg.eventIntervals?.length) {
+      json.eventIntervals = msg.eventIntervals;
+    }
+    return json;
+  },
+
+  /**
+   * @private
+   */
+  _readMessage: function (msg, reader) {
+    while (reader.nextField()) {
+      const field = reader.getFieldNumber();
+      switch (field) {
+        case 1: {
+          msg.eventIntervals.push(reader.readString());
+          break;
+        }
+        default: {
+          reader.skipField();
+          break;
+        }
+      }
+    }
+    return msg;
+  },
+
+  /**
+   * @private
+   */
+  _readMessageJSON: function (msg, json) {
+    const eventIntervals = json.eventIntervals ?? json.eventIntervals;
+    if (eventIntervals) {
+      msg.eventIntervals = eventIntervals;
     }
     return msg;
   },
