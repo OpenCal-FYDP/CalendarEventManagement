@@ -117,7 +117,7 @@ func (s *Scheduler) GetUserEvents(eventOwnerEmail string, eventOwnerUsername str
 
 	t := time.Now().Add(-time.Hour * 12 * 7).Format(time.RFC3339)
 	events, err := srv.Events.List("primary").ShowDeleted(false).
-		SingleEvents(true).TimeMin(t).MaxResults(30).OrderBy("startTime").Do()
+		SingleEvents(true).TimeMin(t).MaxResults(60).OrderBy("startTime").Do()
 	if err != nil {
 		return nil, err
 	}
