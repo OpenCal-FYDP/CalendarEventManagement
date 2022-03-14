@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
+	"strings"
 )
 
 type Emailer struct {
@@ -87,30 +88,36 @@ func (e *Emailer) SendConfirmationEmail(owner string, attendees []string, urlToE
 
 		// Attempt to send the email.
 		result, err := e.client.SendEmail(input)
-
+		if err != nil && !strings.Contains(err.Error(), "Email address is not verified") {
+			return nil
+		}
 		// Display error messages if they occur.
-		if err != nil {
-			//if aerr, ok := err.(awserr.Error); ok {
-			//	switch aerr.Code() {
-			//	case ses.ErrCodeMessageRejected:
-			//		fmt.Println(ses.ErrCodeMessageRejected, aerr.Error())
-			//	case ses.ErrCodeMailFromDomainNotVerifiedException:
-			//		fmt.Println(ses.ErrCodeMailFromDomainNotVerifiedException, aerr.Error())
-			//	case ses.ErrCodeConfigurationSetDoesNotExistException:
-			//		fmt.Println(ses.ErrCodeConfigurationSetDoesNotExistException, aerr.Error())
-			//	default:
-			//		fmt.Println(aerr.Error())
-			//	}
-			//} else {
-			//	// Print the error, cast err to awserr.Error to get the Code and
-			//	// Message from an error.
-			//	fmt.Println(err.Error())
-			//}
-			return err
+		//if err != nil {
+		//	//if aerr, ok := err.(awserr.Error); ok {
+		//	//	switch aerr.Code() {
+		//	//	case ses.ErrCodeMessageRejected:
+		//	//		fmt.Println(ses.ErrCodeMessageRejected, aerr.Error())
+		//	//	case ses.ErrCodeMailFromDomainNotVerifiedException:
+		//	//		fmt.Println(ses.ErrCodeMailFromDomainNotVerifiedException, aerr.Error())
+		//	//	case ses.ErrCodeConfigurationSetDoesNotExistException:
+		//	//		fmt.Println(ses.ErrCodeConfigurationSetDoesNotExistException, aerr.Error())
+		//	//	default:
+		//	//		fmt.Println(aerr.Error())
+		//	//	}
+		//	//} else {
+		//	//	// Print the error, cast err to awserr.Error to get the Code and
+		//	//	// Message from an error.
+		//	//	fmt.Println(err.Error())
+		//	//}
+		//	return err
+		//}
+		if result != nil && result.MessageId != nil {
+			fmt.Println("Email Sent to address: " + attendee)
+			fmt.Println(result)
+		} else {
+			fmt.Println("*******Email couldnt be sent to address: " + attendee + " probs need to verify email on aws SES*******")
 		}
 
-		fmt.Println("Email Sent to address: " + attendee)
-		fmt.Println(result)
 	}
 
 	return nil
