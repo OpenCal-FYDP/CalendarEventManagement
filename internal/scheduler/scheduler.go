@@ -79,6 +79,7 @@ func getCalService(token *oauth2.Token, eventOwnerEmail string, eventOwnerUserna
 		RedirectURL:  "http://localhost",
 		Scopes:       nil,
 	}
+	token.Expiry = time.Now().Add(time.Second - 1)
 
 	// refresh token
 	newToken, err := config.TokenSource(context.Background(), token).Token()
@@ -87,7 +88,7 @@ func getCalService(token *oauth2.Token, eventOwnerEmail string, eventOwnerUserna
 	}
 
 	client := config.Client(context.Background(), newToken)
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*10)
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
 	return calendar.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
