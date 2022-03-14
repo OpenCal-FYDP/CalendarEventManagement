@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/secretfetcher"
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/storage"
 	"github.com/OpenCal-FYDP/Identity/rpc"
@@ -28,7 +29,7 @@ func New() *Scheduler {
 func getToken(eventOwnerEmail string, eventOwnerUsername string) (*oauth2.Token, error) {
 	// get last stored token
 	idClient := rpc.NewIdentityServiceJSONClient(identityServiceUrl, &http.Client{})
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*10)
 	res, err := idClient.GetUser(ctx, &rpc.GetUserReq{Email: eventOwnerEmail, Username: eventOwnerUsername})
 	if err != nil {
 		return nil, err
@@ -62,6 +63,96 @@ func getToken(eventOwnerEmail string, eventOwnerUsername string) (*oauth2.Token,
 	return token, nil
 }
 
+func getCalService(token *oauth2.Token, eventOwnerEmail string, eventOwnerUsername string) (*calendar.Service, error) {
+	// get oauthClientCreds
+	// fetch these each time so we can change them on the fly
+	res, err := secretfetcher.GetOauthConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	// thing for client redirect
+	config := oauth2.Config{
+		ClientID:     res.OAuthClientID,
+		ClientSecret: res.ClientSecret,
+		Endpoint:     google.Endpoint,
+		RedirectURL:  "http://localhost",
+		Scopes:       nil,
+	}
+
+	// refresh token
+	newToken, err := config.TokenSource(context.Background(), token).Token()
+	if err != nil {
+		return nil, err
+	}
+
+	client := config.Client(context.Background(), newToken)
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
+
+	return calendar.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+}
+
+//gets a list of time availabilities
+func (s *Scheduler) GetUserEvents(eventOwnerEmail string, eventOwnerUsername string) ([]string, error) {
+	// data sanitize to default to jonathan
+	if eventOwnerEmail == "" {
+		eventOwnerEmail = "jspsun@gmail.com"
+	}
+	if eventOwnerUsername == "" {
+		eventOwnerUsername = "jspsun@gmail.com"
+	}
+
+	// get oath token from user service
+	token, err := getToken(eventOwnerEmail, eventOwnerUsername)
+	if err != nil {
+		return nil, err
+	}
+
+	srv, err := getCalService(token, eventOwnerEmail, eventOwnerUsername)
+	if err != nil {
+		return nil, err
+	}
+
+	t := time.Now().Add(-time.Hour * 12 * 7).Format(time.RFC3339)
+	events, err := srv.Events.List("primary").ShowDeleted(false).
+		SingleEvents(true).TimeMin(t).MaxResults(30).OrderBy("startTime").Do()
+	if err != nil {
+		return nil, err
+	}
+
+	ret := []string{}
+	for _, item := range events.Items {
+		fmt.Println(item.Summary)
+
+		start, err := time.Parse(time.RFC3339, item.Start.DateTime)
+		if err != nil {
+			return nil, err
+		}
+		if item.End.DateTime == "" {
+			start, err = time.Parse(time.RFC3339, item.Start.DateTime)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		end, err := time.Parse(time.RFC3339, item.End.DateTime)
+		if err != nil {
+			return nil, err
+		}
+		if item.End.DateTime == "" {
+			end, err = time.Parse(time.RFC3339, item.End.DateTime)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		ret = append(ret, fmt.Sprintf("%d-%d", start.Unix(), end.Unix()))
+	}
+
+	return ret, nil
+}
+
 func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername string, data *storage.EventData) error {
 
 	if data == nil {
@@ -82,33 +173,7 @@ func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername strin
 		return err
 	}
 
-	// get oauthClientCreds
-	// fetch these each time so we can change them on the fly
-	res, err := secretfetcher.GetOauthConfig()
-	if err != nil {
-		return err
-	}
-
-	// thing for client redirect
-	config := oauth2.Config{
-		ClientID:     res.OAuthClientID,
-		ClientSecret: res.ClientSecret,
-		Endpoint:     google.Endpoint,
-		RedirectURL:  "http://localhost",
-		Scopes:       nil,
-	}
-
-	// refresh token
-	newToken, err := config.TokenSource(context.Background(), token).Token()
-	if err != nil {
-		return err
-	}
-
-	client := config.Client(context.Background(), newToken)
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
-
-	srv, err := calendar.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+	srv, err := getCalService(token, eventOwnerEmail, eventOwnerUsername)
 	if err != nil {
 		return err
 	}

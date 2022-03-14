@@ -4,6 +4,7 @@ import (
 	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/storage"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
 	"time"
@@ -27,5 +28,11 @@ func TestScheduler(t *testing.T) {
 		s := &Scheduler{}
 		err := s.CreateEvent("", "", e)
 		assert.NoError(t, err)
+	})
+	t.Run("getUserCalEvents", func(t *testing.T) {
+		s := &Scheduler{}
+		ret, err := s.GetUserEvents("", "")
+		require.NoError(t, err)
+		assert.NotNil(t, ret)
 	})
 }

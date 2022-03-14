@@ -22,15 +22,13 @@ func serializeTimeIntervals(start, end time.Time) string {
 
 //TODO remove stub and implement
 func (c *CalEventManagementService) GetUsersGcalEvents(ctx context.Context, req *rpc.GetUsersGcalEventsReq) (*rpc.GetUsersGcalEventsRes, error) {
-	now := time.Now()
+	events, err := c.sched.GetUserEvents(req.GetEmail(), req.GetUsername())
+	if err != nil {
+		return nil, err
+	}
 
 	ret := &rpc.GetUsersGcalEventsRes{
-		EventIntervals: []string{
-			serializeTimeIntervals(now, now.Add(time.Hour*3)),
-			serializeTimeIntervals(now.Add(time.Hour*20), now.Add(time.Hour*20).Add(time.Minute*22)),
-			serializeTimeIntervals(now.Add(time.Hour*30), now.Add(time.Hour*35)),
-			serializeTimeIntervals(now.Add(time.Hour*25), now.Add(time.Hour*33)), // overlaps on purpose
-		},
+		EventIntervals: events,
 	}
 	return ret, nil
 }

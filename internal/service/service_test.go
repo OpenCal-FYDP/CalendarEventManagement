@@ -57,7 +57,10 @@ func TestService(t *testing.T) {
 	})
 	t.Run("getUserEvents", func(t *testing.T) {
 
-		req := &rpc.GetUsersGcalEventsReq{}
+		req := &rpc.GetUsersGcalEventsReq{
+			Email:    "",
+			Username: "",
+		}
 
 		res, err := c.GetUsersGcalEvents(context.Background(), req)
 		require.NoError(t, err)
