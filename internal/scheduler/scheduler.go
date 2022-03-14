@@ -240,6 +240,29 @@ func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername strin
 	return nil
 }
 
-func (s *Scheduler) DeleteEvent(eventOwnerEmail string, eventOwnerUsername string, data *storage.EventData) error {
+func (s *Scheduler) DeleteEvent(eventOwnerEmail string, eventOwnerUsername string, calEventID string) error {
+	// data sanitize to default to jonathan
+	if eventOwnerEmail == "" {
+		eventOwnerEmail = "jspsun@gmail.com"
+	}
+	if eventOwnerUsername == "" {
+		eventOwnerUsername = "jspsun@gmail.com"
+	}
+
+	// get oath token from user service
+	token, err := s.getToken(eventOwnerEmail, eventOwnerUsername)
+	if err != nil {
+		return err
+	}
+
+	srv, err := getCalService(token, eventOwnerEmail, eventOwnerUsername)
+	if err != nil {
+		return err
+	}
+
+	err = srv.Events.Delete("primary", calEventID).Do()
+	if err != nil {
+		return err
+	}
 	return nil
 }

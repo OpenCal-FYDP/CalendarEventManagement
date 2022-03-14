@@ -39,4 +39,14 @@ func TestScheduler(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotNil(t, ret)
 	})
+	t.Run("delete event", func(t *testing.T) {
+
+		err := s.CreateEvent("", "", e)
+		require.NoError(t, err)
+
+		// add a breakpoint here for testing
+
+		err = s.DeleteEvent("", "", e.CalendarEventID) // hardcoded for teamName=bteam hopefully no one deletes this
+		require.NoError(t, err)
+	})
 }
