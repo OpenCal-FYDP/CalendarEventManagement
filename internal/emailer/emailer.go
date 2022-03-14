@@ -8,6 +8,17 @@ import (
 	"strings"
 )
 
+// contains checks if a string is present in a slice
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
+}
+
 type Emailer struct {
 	client *ses.SES
 }
@@ -52,7 +63,7 @@ func (e *Emailer) SendConfirmationEmail(owner string, attendees []string, urlToE
 		// The character encoding for the email.
 		CharSet = "UTF-8"
 	)
-	if owner != "" {
+	if owner != "" && !contains(attendees, owner) {
 		attendees = append(attendees, owner)
 	}
 

@@ -9,6 +9,6 @@ import (
 func TestName(t *testing.T) {
 	emailer, err := New()
 	require.NoError(t, err)
-	err = emailer.SendConfirmationEmail("markbranton99@gmail", []string{"jspsun+test@gmail.com"}, "https://github.com/Jspsun")
+	err = emailer.SendConfirmationEmail("jspsun+test@gmail.com", []string{"jspsun@gmail.com", "jspsun+test@gmail.com"}, "https://github.com/Jspsun")
 	assert.NoError(t, err)
 }
