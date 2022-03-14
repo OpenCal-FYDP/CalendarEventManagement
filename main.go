@@ -32,7 +32,10 @@ func main() {
 		AllowedMethods: []string{"POST"},
 		AllowedHeaders: []string{"Content-Type"},
 	})
-	svc := service.New()
+	svc, err := service.New()
+	if err != nil {
+		log.Panicf("couldnt initialize: %s", err)
+	}
 	server := rpc.NewCalendarEventManagementServiceServer(svc)
 	handler := corsWrapper.Handler(server)
 
