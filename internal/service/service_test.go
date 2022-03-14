@@ -68,8 +68,9 @@ func TestService(t *testing.T) {
 	})
 
 	t.Run("getTeamEvents", func(t *testing.T) {
-
-		req := &rpc.GetTeamsGcalEventsReq{}
+		req := &rpc.GetTeamsGcalEventsReq{
+			TeamID: "05d1b6e2-c7de-43d9-be5f-6c3f3f914b77", // hardcoded for teamName=bteam hopefully no one deletes this
+		}
 
 		res, err := c.GetTeamssGcalEvents(context.Background(), req)
 		require.NoError(t, err)

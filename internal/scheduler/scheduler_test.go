@@ -23,15 +23,19 @@ func TestScheduler(t *testing.T) {
 		Location:        "somewhere",
 		Summary:         "dankSummary",
 	}
+	s := New()
 
 	t.Run("CreateEvent", func(t *testing.T) {
-		s := &Scheduler{}
 		err := s.CreateEvent("", "", e)
 		assert.NoError(t, err)
 	})
 	t.Run("getUserCalEvents", func(t *testing.T) {
-		s := &Scheduler{}
 		ret, err := s.GetUserEvents("", "")
+		require.NoError(t, err)
+		assert.NotNil(t, ret)
+	})
+	t.Run("getTeamEvents", func(t *testing.T) {
+		ret, err := s.GetTeamEvents("05d1b6e2-c7de-43d9-be5f-6c3f3f914b77") // hardcoded for teamName=bteam hopefully no one deletes this
 		require.NoError(t, err)
 		assert.NotNil(t, ret)
 	})

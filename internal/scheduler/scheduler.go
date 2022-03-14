@@ -20,17 +20,19 @@ import (
 const identityServiceUrl = "http://ec2-54-197-128-149.compute-1.amazonaws.com:8080"
 
 type Scheduler struct {
+	idServiceClient rpc.IdentityService
 }
 
 func New() *Scheduler {
-	return &Scheduler{}
+	return &Scheduler{
+		idServiceClient: rpc.NewIdentityServiceJSONClient(identityServiceUrl, &http.Client{}),
+	}
 }
 
-func getToken(eventOwnerEmail string, eventOwnerUsername string) (*oauth2.Token, error) {
+func (s *Scheduler) getToken(eventOwnerEmail string, eventOwnerUsername string) (*oauth2.Token, error) {
 	// get last stored token
-	idClient := rpc.NewIdentityServiceJSONClient(identityServiceUrl, &http.Client{})
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*10)
-	res, err := idClient.GetUser(ctx, &rpc.GetUserReq{Email: eventOwnerEmail, Username: eventOwnerUsername})
+	res, err := s.idServiceClient.GetUser(ctx, &rpc.GetUserReq{Email: eventOwnerEmail, Username: eventOwnerUsername})
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +97,30 @@ func getCalService(token *oauth2.Token, eventOwnerEmail string, eventOwnerUserna
 }
 
 //gets a list of time availabilities
+func (s *Scheduler) GetTeamEvents(teamID string) ([]string, error) {
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*10)
+
+	idReq := &rpc.GetTeamReq{
+		TeamID: teamID,
+	}
+
+	idRes, err := s.idServiceClient.GetTeam(ctx, idReq)
+	if err != nil {
+		return nil, err
+	}
+
+	retEvents := []string{}
+	for _, memberEmail := range idRes.GetTeamMembers() {
+		userEvents, err := s.GetUserEvents(memberEmail, memberEmail)
+		if err != nil {
+			return nil, err
+		}
+		retEvents = append(retEvents, userEvents...)
+	}
+	return retEvents, err
+}
+
+//gets a list of time availabilities
 func (s *Scheduler) GetUserEvents(eventOwnerEmail string, eventOwnerUsername string) ([]string, error) {
 	// data sanitize to default to jonathan
 	if eventOwnerEmail == "" {
@@ -105,7 +131,7 @@ func (s *Scheduler) GetUserEvents(eventOwnerEmail string, eventOwnerUsername str
 	}
 
 	// get oath token from user service
-	token, err := getToken(eventOwnerEmail, eventOwnerUsername)
+	token, err := s.getToken(eventOwnerEmail, eventOwnerUsername)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +150,7 @@ func (s *Scheduler) GetUserEvents(eventOwnerEmail string, eventOwnerUsername str
 
 	ret := []string{}
 	for _, item := range events.Items {
-		fmt.Println(item.Summary)
+		//fmt.Println(item.Summary)
 
 		start, err := time.Parse(time.RFC3339, item.Start.DateTime)
 		if err != nil {
@@ -169,7 +195,7 @@ func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername strin
 	}
 
 	// get oath token from user service
-	token, err := getToken(eventOwnerEmail, eventOwnerUsername)
+	token, err := s.getToken(eventOwnerEmail, eventOwnerUsername)
 	if err != nil {
 		return err
 	}
