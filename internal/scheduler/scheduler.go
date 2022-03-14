@@ -100,6 +100,9 @@ func (s *Scheduler) CreateEvent(eventOwnerEmail string, eventOwnerUsername strin
 
 	// refresh token
 	newToken, err := config.TokenSource(context.Background(), token).Token()
+	if err != nil {
+		return err
+	}
 
 	client := config.Client(context.Background(), newToken)
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
