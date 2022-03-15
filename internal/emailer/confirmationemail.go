@@ -9,7 +9,7 @@ import (
 // The HTML body for the email.
 func EmailConfirmationHTML(url string, data *storage.EventData) string {
 
-	ti := time.Unix(data.Start, 0)
+	ti := time.Unix(data.Start, 0).Local()
 
 	date := fmt.Sprintf("%s %s %d", ti.Weekday().String(), ti.Month().String(), ti.Day())
 	specificTime := ti.Format(time.Kitchen)
