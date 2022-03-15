@@ -19,6 +19,18 @@ func contains(s []string, str string) bool {
 	return false
 }
 
+func removeDuplicateStr(strSlice []string) []string {
+	allKeys := make(map[string]bool)
+	list := []string{}
+	for _, item := range strSlice {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = true
+			list = append(list, item)
+		}
+	}
+	return list
+}
+
 type Emailer struct {
 	client *ses.SES
 }
@@ -66,6 +78,8 @@ func (e *Emailer) SendConfirmationEmail(owner string, attendees []string, urlToE
 	if owner != "" && !contains(attendees, owner) {
 		attendees = append(attendees, owner)
 	}
+
+	attendees = removeDuplicateStr(attendees)
 
 	for _, attendee := range attendees {
 		// Assemble the email.

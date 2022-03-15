@@ -26,7 +26,7 @@ func TestScheduler(t *testing.T) {
 	s := New()
 
 	t.Run("CreateEvent", func(t *testing.T) {
-		err := s.CreateEvent("", "", e)
+		_, err := s.CreateEvent("", "", e)
 		assert.NoError(t, err)
 	})
 	t.Run("getUserCalEvents", func(t *testing.T) {
@@ -41,7 +41,7 @@ func TestScheduler(t *testing.T) {
 	})
 	t.Run("delete event", func(t *testing.T) {
 
-		err := s.CreateEvent("", "", e)
+		_, err := s.CreateEvent("", "", e)
 		require.NoError(t, err)
 
 		// add a breakpoint here for testing
