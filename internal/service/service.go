@@ -74,7 +74,7 @@ func (c *CalEventManagementService) CreateEvent(ctx context.Context, req *rpc.Cr
 	}
 
 	// adds owners
-	err = c.emailr.SendConfirmationEmail(req.GetOwnerOfEvent(), e.Attendees, link)
+	err = c.emailr.SendConfirmationEmail(req.GetOwnerOfEvent(), e.Attendees, e, link)
 	if err != nil {
 		return nil, err
 	}

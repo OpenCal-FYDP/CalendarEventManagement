@@ -2,6 +2,7 @@ package emailer
 
 import (
 	"fmt"
+	"github.com/OpenCal-FYDP/CalendarEventManagement/internal/storage"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
@@ -53,7 +54,7 @@ func New() (*Emailer, error) {
 	}, nil
 }
 
-func (e *Emailer) SendConfirmationEmail(owner string, attendees []string, urlToEvent string) error {
+func (e *Emailer) SendConfirmationEmail(owner string, attendees []string, data *storage.EventData, urlToEvent string) error {
 	const (
 		// This address must be verified with Amazon SES.
 		Sender = "notification@opencal.link"
@@ -94,7 +95,7 @@ func (e *Emailer) SendConfirmationEmail(owner string, attendees []string, urlToE
 				Body: &ses.Body{
 					Html: &ses.Content{
 						Charset: aws.String(CharSet),
-						Data:    aws.String(EmailConfirmationHTML(urlToEvent)),
+						Data:    aws.String(EmailConfirmationHTML(urlToEvent, data)),
 					},
 					Text: &ses.Content{
 						Charset: aws.String(CharSet),
